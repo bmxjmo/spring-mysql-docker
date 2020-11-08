@@ -2,6 +2,7 @@ package com.algaworks.osworks.api.controller;
 
 import com.algaworks.osworks.domain.model.Cliente;
 import com.algaworks.osworks.domain.repository.ClienteRepository;
+import com.algaworks.osworks.domain.service.CadastroClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class ClienteController {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private CadastroClienteService cadastroCliente;
 
     @GetMapping
     public List<Cliente> listar() {
@@ -48,7 +52,7 @@ public class ClienteController {
         }
 
         cliente.setId(clienteId);
-        cliente = clienteRepository.save(cliente);
+        cliente = cadastroCliente.salvar(cliente);
 
         return ResponseEntity.ok(cliente);
     }
@@ -60,7 +64,7 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
 
-        clienteRepository.deleteById(clienteId);
+        cadastroCliente.excluir(clienteId);
 
         return  ResponseEntity.noContent().build();
     }
