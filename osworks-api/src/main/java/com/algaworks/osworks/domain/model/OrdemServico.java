@@ -2,6 +2,7 @@ package com.algaworks.osworks.domain.model;
 
 import com.algaworks.osworks.api.model.Comentario;
 import com.algaworks.osworks.domain.ValidationGroups;
+import com.algaworks.osworks.domain.exception.NegocioException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -122,6 +123,26 @@ public class OrdemServico {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+
+    public void finalizar() {
+
+        if (naoPodeSerFinalizada()) {
+            throw new NegocioException("Ordem de serviço não pode ser finalizada");
+        }
+
+        setStatus(StatusOrdemServico.FINALIZADA);
+        setDataFinalizacao(OffsetDateTime.now());
+
+    }
+
+    public boolean podeSerfinalizada() {
+        return StatusOrdemServico.ABERTA.equals(getStatus());
+    }
+
+    public boolean naoPodeSerFinalizada() {
+        return !podeSerfinalizada();
     }
 
 }

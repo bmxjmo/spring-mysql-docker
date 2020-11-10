@@ -12,6 +12,7 @@ import com.algaworks.osworks.domain.repository.OrdemServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.time.OffsetDateTime;
 
@@ -39,9 +40,16 @@ public class GestaoOrdemServicoService {
         return ordemServicoRepository.save(ordemServico);
     }
 
+    public void finalizar(@PathVariable Long ordemServicoId) {
+        OrdemServico ordemServico = buscar(ordemServicoId);
+
+        ordemServico.finalizar();
+
+        ordemServicoRepository.save(ordemServico);
+    }
+
     public Comentario adicionarComentario (@PathVariable  Long ordemServicoId, String descricao) {
-        OrdemServico ordemServico = ordemServicoRepository.findById(ordemServicoId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Ordem de serviço não encontrada"));
+        OrdemServico ordemServico = buscar(ordemServicoId);
 
         Comentario comentario = new Comentario();
         comentario.setOrdemServico(ordemServico);
@@ -49,6 +57,11 @@ public class GestaoOrdemServicoService {
         comentario.setDataEnvio(OffsetDateTime.now());
 
         return comentarioRepository.save(comentario);
+    }
+
+    private OrdemServico buscar(@PathVariable Long ordemServicoId) {
+        return ordemServicoRepository.findById(ordemServicoId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Ordem de serviço não encontrada"));
     }
 
 }
