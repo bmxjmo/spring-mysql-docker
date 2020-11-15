@@ -41,7 +41,7 @@ public class ClienteController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
-        return clienteRepository.save(cliente);
+        return cadastroCliente.salvar(cliente);
     }
 
     @PutMapping("/{clienteId}")
