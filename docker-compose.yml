@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_DATABASE: osworks
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - data:/var/lib/mysql
+    networks:
+      - backend
+
+  api:
+    container_name: api
+    build:
+      context: ./osworks-api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - db
+    command: sh -c "/wait && java -jar osworks-api-0.0.1.jar"
+    environment:
+      WAIT_HOSTS: db:3306
+      WAIT_HOSTS_TIMEOUT: 30
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/osworks
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 123
+    networks:
+      - backend
+
+  web:
+    build:
+      context: ./osworks-ui
+      dockerfile: Dockerfile
+    stdin_open: true
+    ports:
+      - "3000:3000" 
+    restart: always
+    depends_on:
+      - api
+    links:
+      - api
+    networks:
+      - frontend
+      - backend
+
+volumes:
+  data:
+
+networks:
+  backend:
+  frontend:
