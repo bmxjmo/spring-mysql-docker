@@ -46,7 +46,7 @@ public class ClienteController {
 
     @PutMapping("/{clienteId}")
     public ResponseEntity<Cliente> atualizar(@Valid @PathVariable Long clienteId,
-                                             @RequestBody Cliente cliente) {
+                                             @Valid @RequestBody Cliente cliente) {
         if (!clienteRepository.existsById(clienteId)) {
             return ResponseEntity.notFound().build();
         }
