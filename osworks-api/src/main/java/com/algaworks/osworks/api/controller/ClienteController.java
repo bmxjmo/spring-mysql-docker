@@ -4,13 +4,15 @@ import com.algaworks.osworks.domain.model.Cliente;
 import com.algaworks.osworks.domain.repository.ClienteRepository;
 import com.algaworks.osworks.domain.service.CadastroClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/clientes")
@@ -23,8 +25,25 @@ public class ClienteController {
     private CadastroClienteService cadastroCliente;
 
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteRepository.findAll();
+    public ResponseEntity<Map<String, Object>> listar(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "3") int quantidade) {
+
+        List<Cliente> clientes = new ArrayList<Cliente>();
+
+        Pageable paginacao = PageRequest.of(pagina, quantidade);
+        Page<Cliente> lista = clienteRepository.findAll(paginacao);
+
+        clientes = lista.getContent();
+
+        Map<String, Object> listaClientes = new HashMap<>();
+
+        listaClientes.put("clientes", clientes);
+        listaClientes.put("paginaAtual", lista.getNumber());
+        listaClientes.put("totalQuantidade", lista.getTotalElements());
+        listaClientes.put("totalPaginas", lista.getTotalPages());
+
+        return new ResponseEntity<>(listaClientes, HttpStatus.OK);
     }
 
     @GetMapping("/{clienteId}")
